@@ -4,21 +4,13 @@
 //------------------------------------------------------------------------------
 
 #include "acd2d_ev_function.h"
-#include "data.h"
-
+#include "earcut.hpp"
 #include <vector>
-using namespace std;
-///////////////////////////////////////////////////////////////////////////
-#ifdef WIN32
-extern "C"{
-#include "triangulate.h"
-}
-#else 
-#include "triangulate.h"
-#endif
+#include <array>
 
-namespace acd2d
-{
+using std::vector;
+
+namespace acd2d {
 	
 	typedef pair<int,ev_triangle *> Edge; //a pair of pt id and tri id
 	typedef vector<Edge> EV;   //vector of Edge
@@ -75,23 +67,19 @@ namespace acd2d
 	//return the triangle contains s and e
 	ev_triangle * triangulate( ev_vertex * pts, int polysize )
 	{
-		//repare for triangulation
-		double * v=new double[polysize*2];
-		int trisize=polysize-2;
-		int * t=new int[3*trisize];   //to hold resulting triangles
+		//prepare for triangulation
+		vector<vector<std::array<double, 2>>> v = {vector<std::array<double, 2>>(polysize, {0,0})};
 		
 		//copy vertices
 		for(int i=0;i<polysize;i++){
 			const Point2d& pos=pts[i].v->getPos();
-			v[2*i]=pos[0]; v[2*i+1]=pos[1];
+			std::copy(pos.get(), pos.get() + 2, std::begin(v.front().at(i)));
 		}//end for
 		
-		FIST_PolygonalArray(1, &polysize, (double(*)[2])v, &trisize, (int(*)[3])t);
-	
-		ev_triangle * tri=dualT(t,trisize,polysize);
-	
-		delete [] v;
-		delete [] t;
+		auto t = mapbox::earcut<int>(v);
+			
+		ev_triangle * tri=dualT(t.data(), t.size() / 3, polysize);
+		
 		return tri;
 	}
 	

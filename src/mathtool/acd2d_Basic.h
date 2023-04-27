@@ -24,7 +24,6 @@ namespace acd2d
     #define HUGENUMBER  1.0e10
 
     /* Miscellaneous Scalar Math */
-    #define abs(x)      (((x) < 0) ? (-(x)) : (x))
     #define sqr(x)      ((x) * (x))
     
     /* Angle Conversions & Constants */
