@@ -8,7 +8,7 @@
 
 #include "acd2d_data.h"
 #include "acd2d_util.h"
-#include "acd2d_hull.h"
+#include "hull/acd2d_hull.h"
 
 namespace acd2d
 {

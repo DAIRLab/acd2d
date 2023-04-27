@@ -7,7 +7,7 @@
 #define _CD2D_CUT_DIR_H_
 
 #include "acd2d_data.h"
-#include "acd2d_edge_visibility.h"
+#include "edge_visibility/acd2d_edge_visibility.h"
  
 namespace acd2d
 {

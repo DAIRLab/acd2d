@@ -13,8 +13,8 @@
 #include <list>
 using namespace std;
 
-#include <acd2d_Point.h>
-#include <acd2d_Vector.h>
+#include <mathtool/acd2d_Point.h>
+#include <mathtool/acd2d_Vector.h>
 
 namespace acd2d
 {

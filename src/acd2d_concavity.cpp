@@ -5,7 +5,7 @@
 
 #include "acd2d_concavity.h"
 #include "acd2d_util.h"
-#include "acd2d_edge_visibility.h"	
+#include "edge_visibility/acd2d_edge_visibility.h"	
 #include <iostream>
 using namespace std;
 
