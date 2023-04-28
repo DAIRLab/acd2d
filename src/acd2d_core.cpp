@@ -54,12 +54,18 @@ namespace acd2d
 	
 	///////////////////////////////////////////////////////////////////////////
 	void cd_2d::decomposeAll(double d, IConcavityMeasure * measure)
-	{
+	{	const int iter_limit = 100;
+		int iter = 0;
 		if( d<1e-20 ) d=1e-20;
-		do{
-			decompose(d,measure);
+		do {
+			try {
+				decompose(d,measure);
+				iter++;
+			} catch(const std::exception& e) {
+				throw std::runtime_error(e.what());
+			}			
 		}
-		while(!todo_list.empty());
+		while(!todo_list.empty() and iter < iter_limit);
 	}
 	
 	void cd_2d::decompose(double d, IConcavityMeasure * measure)
@@ -76,7 +82,12 @@ namespace acd2d
 	
 		for(;ips!=ps.end();ips++){
 			cd_polygon& polys=*ips;
-			decompose(d,polys);
+			try {
+				decompose(d,polys);
+			} catch (exception e) {
+				throw std::runtime_error(e.what());
+			}
+			
 		}
 	}
 	
@@ -86,8 +97,14 @@ namespace acd2d
 		cd_poly poly=polys.next();
 		if( poly.getType()==cd_poly::PIN ) // hole
 			decompose_IN(d,polys,poly);
-		else //out most boundary
-			decompose_OUT(d,polys,findOutMost(polys));
+		else {
+			try {
+				decompose_OUT(d,polys,findOutMost(polys));
+			} catch (exception e) {
+				throw std::runtime_error(e.what());
+			}
+		}
+			
 	}
 	
 	void cd_2d::decompose_OUT(double d, cd_polygon& polys, cd_poly& poly)
@@ -116,7 +133,7 @@ namespace acd2d
 			cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l);
 			if(store_diagoanls) dia_list.push_back(dia);
 		} catch (exception e) {
-			return;
+			throw std::runtime_error(e.what());
 		}
 		
 	
