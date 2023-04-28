@@ -11,6 +11,7 @@
 #endif
 
 #include <list>
+#include <stdexcept>
 using namespace std;
 
 #include <mathtool/acd2d_Point.h>

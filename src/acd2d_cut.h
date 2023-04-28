@@ -160,7 +160,7 @@ namespace acd2d
 				<<cut_l.vec[0]<<","<<cut_l.vec[1]<<")\n";
 			cerr<<"! ERROR Info: Polygon=\n"
 				<<poly<<endl;
-			exit(1);
+			return {nullptr, nullptr};
 		}
 	}
 	
@@ -172,6 +172,11 @@ namespace acd2d
 	{
 		//find cuts
 		pair<cd_vertex*, cd_vertex*> cut = FindCut_Out(poly,cut_l);
+
+		if (cut.first == nullptr and cut.second == nullptr) {
+			throw std::runtime_error("bad cut");
+		}
+
 		cd_vertex * v1=cut.first;
 		cd_vertex * v2=cut.second;
 	

@@ -112,14 +112,17 @@ namespace acd2d
 	
 		//cut into two polys
 		pair<cd_polygon,cd_polygon> sub_polys;
-		cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l);
+		try{
+			cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l);
+			if(store_diagoanls) dia_list.push_back(dia);
+		} catch (exception e) {
+			return;
+		}
+		
 	
 		//add into to do
 		todo_list.push_back(sub_polys.first);
 		todo_list.push_back(sub_polys.second);
-	
-		//store cut line
-		if(store_diagoanls) dia_list.push_back(dia);
 	}
 	
 	void cd_2d::decompose_IN(double d, cd_polygon& polys, cd_poly& poly)
