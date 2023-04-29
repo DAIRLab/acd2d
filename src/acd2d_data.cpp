@@ -133,8 +133,8 @@ namespace acd2d
 			cd_vertex * n=ptr->getNext();
 			delete ptr;
 			ptr=n;
-		}while( ptr!=head );
-		head=tail=NULL;
+		}while( ptr!=head and ptr != nullptr);
+		head=tail=nullptr;
 	}
 	
 	// Create a empty polygon
@@ -601,9 +601,9 @@ namespace acd2d
 	}
 	
 	void cd_polygon::destroy()
-	{
-		for(iterator i=begin();i!=end();i++){
-			i->destroy();
+    {
+		for(auto & i : *this) {
+			i.destroy();
 		}
 		clear(); //remove all ply from this list
 	}

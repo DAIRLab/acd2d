@@ -77,10 +77,11 @@ namespace acd2d {
 		}//end for
 		
 		auto t = mapbox::earcut<int>(v);
-			
-		ev_triangle * tri=dualT(t.data(), t.size() / 3, polysize);
-		
-		return tri;
+
+        if (t.size() > 0) {
+          return dualT(t.data(), t.size() / 3, polysize);
+        }
+        return nullptr;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////

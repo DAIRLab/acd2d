@@ -67,7 +67,17 @@ namespace acd2d
 		}
 		while(!todo_list.empty() and iter < iter_limit);
 	}
-	
+    void cd_2d::maybe_decomposeAll(double d, IConcavityMeasure * measure)
+    {	const int iter_limit = 100;
+      int iter = 0;
+      if( d<1e-20 ) d=1e-20;
+      do {
+          maybe_decompose(d, measure);
+          iter++;
+      }
+      while(!todo_list.empty() and iter < iter_limit);
+    }
+
 	void cd_2d::decompose(double d, IConcavityMeasure * measure)
 	{
 		list<cd_polygon> ps;
@@ -90,9 +100,26 @@ namespace acd2d
 			
 		}
 	}
+
+    void cd_2d::maybe_decompose(double d, IConcavityMeasure * measure)
+    {
+      list<cd_polygon> ps;
+      ps.swap(todo_list);
+      list<cd_polygon>::iterator ips=ps.begin();
+      m_measure=measure;
+      if( m_measure==nullptr ) {
+        cerr<<"! ERROR: cd_2d::decompose: measure si NULL"<<endl;
+        return;
+      }
+      if( d<1e-20 ) d=1e-20;
+
+      for(;ips!=ps.end();ips++){
+        cd_polygon& polys=*ips;
+        maybe_decompose(d,polys);
+      }
+    }
 	
-	void cd_2d::decompose(double d, cd_polygon& polys)
-	{
+	void cd_2d::decompose(double d, cd_polygon& polys) {
 		//if there are inner polys, random pick one and find the cut
 		cd_poly poly=polys.next();
 		if( poly.getType()==cd_poly::PIN ) // hole
@@ -104,8 +131,17 @@ namespace acd2d
 				throw std::runtime_error(e.what());
 			}
 		}
-			
 	}
+
+    void cd_2d::maybe_decompose(double d, cd_polygon& polys) {
+      //if there are inner polys, random pick one and find the cut
+      cd_poly poly = polys.next();
+      if( poly.getType()==cd_poly::PIN ) // hole
+        decompose_IN(d,polys,poly);
+      else {
+        maybe_decompose_OUT(d,polys,findOutMost(polys));
+      }
+    }
 	
 	void cd_2d::decompose_OUT(double d, cd_polygon& polys, cd_poly& poly)
 	{
@@ -135,13 +171,46 @@ namespace acd2d
 		} catch (exception e) {
 			throw std::runtime_error(e.what());
 		}
-		
 	
 		//add into to do
 		todo_list.push_back(sub_polys.first);
 		todo_list.push_back(sub_polys.second);
 	}
-	
+
+
+    void cd_2d::maybe_decompose_OUT(double d, cd_polygon& polys, cd_poly& poly)
+    {
+      cd_line cut_l; //cut line
+
+      //check if we need to cut it.
+      cd_vertex * r=poly.findCW(m_measure).first;
+
+      if( r==nullptr ){
+        done_list.push_back(polys);
+        return;
+      }
+
+      //smaller than tolerance
+      if( r->getConcavity()<d ){
+        done_list.push_back(polys);
+        return;
+      }
+
+      find_a_good_cutline(cut_l,r,alpha,beta);
+
+      //cut into two polys
+      pair<cd_polygon,cd_polygon> sub_polys;
+      try{
+        cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l);
+        if(store_diagoanls) dia_list.push_back(dia);
+        //add into to do
+        todo_list.push_back(sub_polys.first);
+        todo_list.push_back(sub_polys.second);
+      } catch (exception e) {
+        return;
+      }
+    }
+
 	void cd_2d::decompose_IN(double d, cd_polygon& polys, cd_poly& poly)
 	{
 		//find the out most boundary

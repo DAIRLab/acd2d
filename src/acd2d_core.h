@@ -39,6 +39,8 @@ namespace acd2d
 		// Do decomposition once/All
 		void decomposeAll(double d, IConcavityMeasure * measure);
 		void decompose(double d, IConcavityMeasure * measure);
+        void maybe_decomposeAll(double d, IConcavityMeasure * measure);
+        void maybe_decompose(double d, IConcavityMeasure * measure);
 	
 		///////////////////////////////////////////////////////////////////////////
 		//access functions
@@ -52,10 +54,12 @@ namespace acd2d
 	
 		
 	protected:
-	
-		void decompose(double d, cd_polygon& polys );
-		void decompose_OUT(double d, cd_polygon& polys, cd_poly& poly);
-		void decompose_IN(double d, cd_polygon& polys, cd_poly& poly);
+
+        void maybe_decompose(double d, cd_polygon& polys );
+        void maybe_decompose_OUT(double d, cd_polygon& polys, cd_poly& poly);
+        void decompose(double d, cd_polygon& polys );
+        void decompose_OUT(double d, cd_polygon& polys, cd_poly& poly);
+        void decompose_IN(double d, cd_polygon& polys, cd_poly& poly);
 	
 	private:
 	

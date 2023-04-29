@@ -137,7 +137,7 @@ namespace acd2d
 			if( cur == cut_l.support || cur->getPos()==cut_l.support->getPos())continue;
 			if( cur==cut_l.support->getPre() || cur->getNext()->getPos()==cut_l.support->getPos())continue;
 			//commented out since this is not problem anymore when hole merge padding is used + it caused crash for error_boundaries.poly
-			// if( !isInBoundaries(cur->getNext(), cut_l.support))continue; //don't pick the wrong point of a hole connection duplicate
+			 if( !isInBoundaries(cur->getNext(), cut_l.support))continue; //don't pick the wrong point of a hole connection duplicate
 			if( cur->getU()<-1e-5 )continue;
 			if( cur->getU()<min_U ){
 				min_U=cur->getU();
@@ -145,23 +145,11 @@ namespace acd2d
 			}
 		}
 	
-		if(closest!=NULL) 
-			return pair<cd_vertex*,cd_vertex*>(cut_l.support,closest);
-	
-		{//ERROR
-			cerr<<"! ERROR: FindCut_Out Error\n";
-			for( VIT iv=coll.begin();iv!=coll.end();iv++){
-				cd_vertex* cur=*iv;
-				cout<<"! ERROR Info: U="<<cur->getU()<<"\n";
-			}
-			cerr<<"! ERROR Info: Cut line O=("
-				<<cut_l.origin[0]<<","<<cut_l.origin[1]<<")\n"
-				<<"! ERROR Info: Cut line V=("
-				<<cut_l.vec[0]<<","<<cut_l.vec[1]<<")\n";
-			cerr<<"! ERROR Info: Polygon=\n"
-				<<poly<<endl;
-			return {nullptr, nullptr};
-		}
+		if(closest!=NULL){
+          return pair<cd_vertex*,cd_vertex*>(cut_l.support,closest);
+        }
+        // return nullptrs to be handled by decompose
+        return {nullptr, nullptr};
 	}
 	
 	/**
@@ -214,8 +202,8 @@ namespace acd2d
         for(auto v : coll )
         {
 			if( v->getU()<0 ) continue; //not in the right dir
-			//commented out since this is not problem anymore when hole merge padding is used + it caused crash for error_boundaries.poly
-			// if( !isInBoundaries(v->getNext(), cut_l.support))continue; //don't pick the wrong point of a hole connection duplicate
+            //don't pick the wrong point of a hole connection duplicate
+			 if ( !isInBoundaries(v->getNext(), cut_l.support)) continue;
 			if( v->getU()<min_u ){ 
 				min_u=v->getU();
 				min_v=v;
