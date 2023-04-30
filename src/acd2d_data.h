@@ -19,7 +19,7 @@ using namespace std;
 
 namespace acd2d
 {
-
+	static constexpr int kMaxIter = 1e5;
 	class cd_vertex;
 	class cd_bridge;
 	class hull_2d;

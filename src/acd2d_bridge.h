@@ -36,7 +36,14 @@ namespace acd2d
 	//set s->e 's bridge to b.
 	inline void setBridge( cd_bridge * b, cd_vertex * s, cd_vertex * e )
 	{
-		while(s!=e){ s->setBridge(b); s=s->getNext(); }
+		int iter = 0;
+		while(s!=e and iter < kMaxIter){ 
+			s->setBridge(b); s=s->getNext(); 
+			iter++;
+		}
+		if (iter  == kMaxIter) {
+			throw std::runtime_error("too many iter");
+		}
 	}
 	
 	inline void construct_bridges( cd_vertex * s, cd_vertex * e)

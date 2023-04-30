@@ -296,6 +296,7 @@ namespace acd2d
 		if( type==PIN ) return; //no bridge for holes
 		if( head==NULL ) return;
 		cd_vertex * ptr=head;
+		int iter = 0;
 		do{
 			cd_bridge * b=ptr->getBridge();
 			if( b==NULL ) ptr=ptr->getNext();
@@ -304,7 +305,11 @@ namespace acd2d
 				bridges.push_back(b);
 				ptr=b->v2;
 			}
-		}while(ptr!=head);
+			iter++;
+		}while(ptr!=head and iter < kMaxIter);
+		if (iter == kMaxIter) {
+			throw std::runtime_error("found it");
+		}
 	}
 	
 	void cd_poly::scale(float f)
