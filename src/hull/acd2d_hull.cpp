@@ -90,10 +90,9 @@ namespace acd2d
 		hull.push_front(hull.back());
 	
 		//incrementally create the hull
-		int iter_limit=1000;
 		int total_iter=0;
 		cd_vertex * ptr=next(hull.back());
-		while(ptr!=ne and total_iter < iter_limit){
+		while(ptr!=ne and total_iter < kMaxIter){
 			total_iter++;
 			//check if the ptr is contained in the hull
 			if( !inHull(ptr,hull) ){
@@ -104,7 +103,7 @@ namespace acd2d
 			}
 			ptr=next(ptr);
 		}//while(ptr!=ne);
-		if (total_iter == iter_limit) {
+		if (total_iter == kMaxIter) {
 			throw std::runtime_error("found it");
 		}
 		hull.pop_back();
