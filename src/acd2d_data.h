@@ -23,7 +23,6 @@ namespace acd2d
 	static constexpr int kMaxIter = 1e5;
 	class cd_vertex;
 	class cd_bridge;
-	class hull_2d;
 	class IConcavityMeasure;
     class cd_databuffer;
 	
@@ -150,10 +149,9 @@ namespace acd2d
 		typedef pair<cd_vertex*,cd_poly*> IV;   //intersecting vertex
 		void findCollEdges( list<cd_vertex*>& coll, cd_line& cut_l);
 		pair<cd_vertex*,cd_vertex*>&
-		findCW(IConcavityMeasure * measure); //compute concavity witness
+		findCW(IConcavityMeasure * measure, cd_databuffer& buf); //compute concavity witness
 		void updateSize();
-		cd_vertex* computeClosePt(const Point2d& pos);
-	
+
 		///////////////////////////////////////////////////////////////////////////
 		// Access
 		cd_vertex * getHead() const { return head; }
@@ -187,7 +185,6 @@ namespace acd2d
 	
 		//check if give poly line is the same as this
 		bool operator==( const cd_poly& other ){ return other.head==head; }
-		friend istream& operator>>( istream&, cd_poly& );
 		friend ostream& operator<<( ostream&, const cd_poly& );
 	
 	protected:
@@ -195,7 +192,7 @@ namespace acd2d
 		///////////////////////////////////////////////////////////////////////////
 		void doInit(); /*return # of vertice in this poly*/
 		void findHoleCW(); //for hole boundary
-		void findMaxNotch(IConcavityMeasure * measure); //for out most chain
+		void findMaxNotch(IConcavityMeasure * measure, cd_databuffer& buf); //for out most chain
 	
 	private:
 	
@@ -222,9 +219,8 @@ namespace acd2d
 	
 	public: 
 		cd_polygon(){}
-		void buildDependency();
+		void buildDependency(cd_databuffer& buf);
 		cd_poly next(); //get the next polychain to be resolved
-		cd_poly& outmost();
 		void scale(float factor);
 		void normalize();
 		bool valid() const; //check if this is a valid polygon
@@ -244,7 +240,7 @@ namespace acd2d
 	
 		//Compute the better cocavity of a hole bounday, p must be a hole
 		//better means closer to the out most bounday
-		pair<Point2d,Point2d> computeCW(cd_poly& p);
+		pair<Point2d,Point2d> computeCW(cd_poly& p, cd_databuffer& buf);
 		
 		// check if the line segment p1p2 collide with other holes
 		// these intersecting holes must be resolved before this...
@@ -261,7 +257,7 @@ namespace acd2d
 
     class cd_databuffer {
      public:
-      static constexpr size_t kExpectedMaxVerts = 1024;
+      static constexpr size_t kExpectedMaxVerts = 2048;
       cd_databuffer() {verts.reserve(kExpectedMaxVerts);}
       cd_vertex* getNewVertex() {
         verts.emplace_back();

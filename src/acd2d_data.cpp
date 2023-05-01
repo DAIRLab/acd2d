@@ -201,11 +201,11 @@ namespace acd2d
 		}while( ptr!=first );
 	}
 	
-	pair<cd_vertex*,cd_vertex*>& cd_poly::findCW(IConcavityMeasure * measure)
+	pair<cd_vertex*,cd_vertex*>& cd_poly::findCW(IConcavityMeasure * measure, cd_databuffer& buf)
 	{
 		m_CW.first=m_CW.second=NULL;
 		if( type==POUT )
-			findMaxNotch(measure);
+			findMaxNotch(measure, buf);
 		else
 			findHoleCW();
 		return m_CW;
@@ -214,11 +214,11 @@ namespace acd2d
 	/**
 	 * Find the notch with maximum concavity
 	 */
-	void cd_poly::findMaxNotch(IConcavityMeasure * measure)
+	void cd_poly::findMaxNotch(IConcavityMeasure * measure, cd_databuffer& buf)
 	{   
 		if( type!=POUT ) cerr<<"! ERROR: findMaxNotch Error"<<endl;
 		///////////////////////////////////////////////////////////////////////////
-		construct_bridges(head,tail);
+		construct_bridges(head, tail, buf);
 		///////////////////////////////////////////////////////////////////////////
 		list<cd_bridge*> bridges;
 		typedef list<cd_bridge*>::iterator BIT;
@@ -395,7 +395,7 @@ namespace acd2d
 	///////////////////////////////////////////////////////////////////////////////
 	
 	//build the decomposing ordering
-	void cd_polygon::buildDependency()
+	void cd_polygon::buildDependency(cd_databuffer& buf)
 	{
 		typedef list<cd_poly>::iterator PIT;
 	
@@ -410,7 +410,7 @@ namespace acd2d
 		//for each hole
 		for(DIT id=m_DependList.begin();id!=m_DependList.end();id++ ){
 			//find its CW
-			pair<Point2d,Point2d> line=computeCW( (*id)->m_host );
+			pair<Point2d,Point2d> line=computeCW( (*id)->m_host, buf);
 			findDependency(line.first,line.second,*id);
 		}//end for
 	}
@@ -458,10 +458,10 @@ namespace acd2d
 		}
 	}
 	
-	pair<Point2d,Point2d> cd_polygon::computeCW(cd_poly& p)
+	pair<Point2d,Point2d> cd_polygon::computeCW(cd_poly& p, cd_databuffer& buf)
 	{
 		//find its CW
-		pair<cd_vertex*,cd_vertex*>& cw=p.findCW(NULL);
+		pair<cd_vertex*,cd_vertex*>& cw=p.findCW(NULL, buf);
 	
 		//find a better CW
 		cd_poly& Outmost=findOutMost(*this);
@@ -552,41 +552,6 @@ namespace acd2d
 			push_back(p);
 		}
 	}
-	
-	ostream& operator<<( ostream& out, const cd_polygon& p)
-	{
-		typedef list<cd_poly>::const_iterator PIT;
-		for(PIT i=p.begin();i!=p.end();i++)
-			out<<*i;
-		return out;
-	}
-	
-	
-	istream& operator>>( istream& is, cd_polygon& p)
-	{
-		//remove header comments
-		do{
-			char tmp[1024];
-			char c=is.peek();
-			if(isspace(c)) is.get(c); //eat it
-			else if(c=='#') {
-				is.getline(tmp,1024);
-			}
-			else break;
-		}while(true);
-	
-		//start reading
-		unsigned int size;
-		is>>size;
-		unsigned int vid=0;
-		for(unsigned int i=0;i<size;i++){
-			cd_poly poly(cd_poly::UNKNOWN);
-			is>>poly;
-			p.push_back(poly);
-		}
-		return is;
-	}
-	
 	
 	///////////////////////////////////////////////////////////////////////////////
 	//

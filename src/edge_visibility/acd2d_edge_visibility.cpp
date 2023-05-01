@@ -181,12 +181,12 @@ namespace acd2d
 	///////////////////////////////////////////////////////////////////////////////
 	//build two visibility trees from s and e to points in array pts
 	void build_viz_tree
-	( int s, int e, ev_vertex * pts )
+	( int s, int e, ev_vertex * pts, ev_tri_buffer& buf )
 	{
 		//triangulate the poly
 		int vsize=e-s+1;
 		//the tri that contains s and e
-		ev_triangle * tri=triangulate(&pts[s],vsize);
+		ev_triangle * tri=triangulate(&pts[s],vsize, buf);
 		if( tri==NULL )
 			return;
 		//build trees
@@ -194,15 +194,14 @@ namespace acd2d
 		build_viz_tree(0,vsize-1,tri,pts+s);
 		g_id=1;
 		build_viz_tree(vsize-1,0,tri,pts+s);
-	
-		//delete triangles
-		free_triangle(tri);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////
 	// Find the shortest path for all point between s and e to the edge (s,e)
 	void shortest_path_to_edge(vertex * s, vertex * e,P2E_CALLBACK p2ec)
 	{
+        ev_tri_buffer tri_buf;
+
 		//count vertex size
 		int vsize=1;
 		vertex * ptr=s;
@@ -216,7 +215,7 @@ namespace acd2d
 		}
 	
 		//build two trees from the end pts of edge
-		build_viz_tree(0,vsize-1,pts);
+		build_viz_tree(0,vsize-1,pts, tri_buf);
 	
 		//identify visible vertex from edge
 		identify_edge_visibility(&pts[0],&pts[vsize-1]);
@@ -229,7 +228,7 @@ namespace acd2d
 				for( int i=is->first;i<=is->second;i++ ){
 					pts[i].reset();
 				}
-				build_viz_tree(is->first, is->second, pts);
+				build_viz_tree(is->first, is->second, pts, tri_buf);
 				shortest_path(&pts[is->first],&pts[is->second]);
 			}//end for SIT
 		}//end
@@ -250,6 +249,7 @@ namespace acd2d
 	// Get all visible vertices from s in the polygon
 	void visible_vertices( list<vertex *>& visibleV, vertex * s)
 	{
+        ev_tri_buffer tri_buf;
 		if( s==NULL ) return;
 		int size=0;
 		vertex * ptr=s;
@@ -259,7 +259,7 @@ namespace acd2d
 		ptr=s;
 		for( int i=0;i<size;i++,ptr=ptr->getNext()) pts[i].v=ptr;
 		//triangulate
-		ev_triangle * tri = triangulate(pts,size);
+		ev_triangle * tri = triangulate(pts,size, tri_buf);
 	
 		g_id=0; //reset gid
 		build_viz_tree(0,size-1,tri,pts);
@@ -270,7 +270,6 @@ namespace acd2d
 			visibleV.push_back((*iv)->v);
 	
 		//delete pts
-		free_triangle(tri);
 		delete [] pts;
 	}
 

@@ -46,7 +46,7 @@ namespace acd2d
 		}
 	}
 	
-	inline void construct_bridges( cd_vertex * s, cd_vertex * e)
+	inline void construct_bridges( cd_vertex * s, cd_vertex * e, cd_databuffer& buf)
 	{
 		///////////////////////////////////////////////////////////////////////////
 		list<cd_vertex*> hull;
@@ -64,7 +64,7 @@ namespace acd2d
 			VIT nit=it; nit++;
 			if( nit==hull.end() ) nit=hull.begin();
 			if( v->getNext()==(*nit) ) continue;
-			cd_bridge * b=new cd_bridge();
+			cd_bridge * b = buf.getNewBridge();
 			b->v1=v; b->v2=*nit;
 			setBridge(b,b->v1,b->v2);
 		}
@@ -75,7 +75,6 @@ namespace acd2d
 		if( v->getBridge()!=NULL ){
 			cd_bridge * b=v->getBridge();
 			setBridge(NULL,b->v1,b->v2);
-			delete b;
 		}
 	}
 	

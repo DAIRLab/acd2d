@@ -30,7 +30,7 @@ namespace acd2d {
 	}
 	
 	//returns the triangle contains (0,N-1) and build the dual of given triangles
-	inline ev_triangle * dualT(int * t, int tsize, int psize)
+	inline ev_triangle * dualT(int * t, int tsize, int psize,  ev_tri_buffer& buf )
 	{
 		int last=psize-1;
 	
@@ -40,7 +40,7 @@ namespace acd2d {
 		vector<EV> hash(psize,EV());
 		
 		for( int it=0;it<tsize;it++ ){ //for each triangle
-			ev_triangle * cur_tri=new ev_triangle();
+			ev_triangle * cur_tri = buf.getNew();
 			if( it==0 ) first_T=cur_tri;
 			for(int ie=0;ie<3;ie++ ){ //for each edge in this triangle
 				int vid1=t[it*3+ie];       //edge start
@@ -59,13 +59,11 @@ namespace acd2d {
 				{for(int i=0;i<3;i++) if(nei_tri->t[i]==NULL){nei_tri->t[i]=cur_tri; break;}}
 			}
 		}//end it
-		
-		if(start_T==NULL) free_triangle(first_T);
 		return start_T;
 	}
 	
 	//return the triangle contains s and e
-	ev_triangle * triangulate( ev_vertex * pts, int polysize )
+	ev_triangle * triangulate( ev_vertex * pts, int polysize,  ev_tri_buffer& buf)
 	{
 		//prepare for triangulation
 		vector<vector<std::array<double, 2>>> v = {vector<std::array<double, 2>>(polysize, {0,0})};
@@ -79,25 +77,10 @@ namespace acd2d {
 		auto t = mapbox::earcut<int>(v);
 
         if (t.size() > 0) {
-          return dualT(t.data(), t.size() / 3, polysize);
+          return dualT(t.data(), t.size() / 3, polysize, buf);
         }
         return nullptr;
 	}
-	
-	///////////////////////////////////////////////////////////////////////////////
-	// deallocate all triangles
-	void free_triangle( ev_triangle * t, ev_triangle * p )
-	{
-		for( int i=0;i<3;i++ ){
-			if( t->t[i]==NULL || t->t[i]==p ) continue;
-			free_triangle(t->t[i],t);
-		}
-		delete t;
-	}
-	
-	void free_triangle( ev_triangle * t )
-	{
-		free_triangle(t,NULL);
-	}
+
 	
 } //namespace acd2d

@@ -37,7 +37,7 @@ namespace acd2d
 			cd_polygon mypoly;
 			todo_list.push_back(mypoly);
 			todo_list.back().copy(buf_, poly);
-			todo_list.back().buildDependency();
+			todo_list.back().buildDependency(buf_);
 		}
 		else
 			cerr<<"! Error: acd_2d::addPolygon: Not a valid polygon"<<endl;
@@ -145,7 +145,7 @@ namespace acd2d
 		cd_line cut_l; //cut line
 	
 		//check if we need to cut it.
-		cd_vertex * r=poly.findCW(m_measure).first;
+		cd_vertex * r=poly.findCW(m_measure, buf_).first;
 	
 		if( r==NULL ){
 			done_list.push_back(polys);
@@ -180,7 +180,7 @@ namespace acd2d
       cd_line cut_l; //cut line
 
       //check if we need to cut it.
-      cd_vertex * r=poly.findCW(m_measure).first;
+      cd_vertex * r=poly.findCW(m_measure, buf_).first;
 
       if( r==nullptr ){
         done_list.push_back(polys);

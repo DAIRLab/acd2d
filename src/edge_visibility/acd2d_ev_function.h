@@ -11,10 +11,7 @@
 namespace acd2d
 {
 	//return the triangle contains s and e
-	ev_triangle * triangulate( ev_vertex * pts, int polysize );
-	
-	//delete all triangles
-	void free_triangle( ev_triangle * t );
+	ev_triangle * triangulate( ev_vertex * pts, int polysize, ev_tri_buffer& buf );
 }
 
 #endif //_EV_FUNCTION_H_

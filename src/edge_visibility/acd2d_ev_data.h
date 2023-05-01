@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <list>
+#include <csignal>
 using namespace std;
 
 #include "acd2d_data.h"
@@ -56,8 +57,24 @@ namespace acd2d
 		}
 	
 		int v[3];
-		ev_triangle * t[3];
+		ev_triangle * t[3] = {nullptr, nullptr, nullptr};
 	};
+
+    class ev_tri_buffer {
+     public:
+      ev_triangle * getNew() {
+        if (idx < 256) {
+          ev_triangle* ret = buf_ + idx;
+          idx++;
+          return ret;
+        }
+        std::cout << "triangle count exceeded\n";
+        raise(SIGSEGV);
+      }
+     private:
+      ev_triangle buf_[256];
+      int idx = 0;
+    };
 	
 	
 	/**
