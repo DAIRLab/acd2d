@@ -62,8 +62,9 @@ namespace acd2d
 
     class ev_tri_buffer {
      public:
+      static constexpr int kMaxTriCount = 1024;
       ev_triangle * getNew() {
-        if (idx < 256) {
+        if (idx < kMaxTriCount) {
           ev_triangle* ret = buf_ + idx;
           idx++;
           return ret;
@@ -72,7 +73,7 @@ namespace acd2d
         raise(SIGSEGV);
       }
      private:
-      ev_triangle buf_[256];
+      ev_triangle buf_[kMaxTriCount];
       int idx = 0;
     };
 	
