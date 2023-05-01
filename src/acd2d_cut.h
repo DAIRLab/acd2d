@@ -30,20 +30,17 @@ namespace acd2d
 		if( v->getPos().almost_equ(v->getNext()->getPos()) ){ //dup
 			cd_vertex * dup=v->getNext();
 			v->setNext(dup->getNext());
-			delete dup;
 		}
 		else v=v->getNext();
 		
 		if( v->getPos().almost_equ(v->getNext()->getPos()) ){ //dup
 			cd_vertex * dup=v->getNext();
 			v->setNext(dup->getNext());
-			delete dup;
 		}
 		else v=v->getNext();
 		
 		if( v->getPos().almost_equ(v->getNext()->getPos()) ){ //dup
 			v->getPre()->setNext(v->getNext());
-			delete v;
 		}
 	}
 	
@@ -74,17 +71,17 @@ namespace acd2d
 	/**
 	 * split edges in the cut.
 	 */
-	inline void addDiagnal( cd_vertex* v1, cd_vertex * v2, bool usePadding = false )
+	inline void addDiagnal( cd_vertex* v1, cd_vertex * v2, cd_databuffer& buf, bool usePadding = false )
 	{
 		cd_vertex * v1n=v1->getNext();
 		cd_vertex * v2n=v2->getNext();
 		
 		const auto &v1ipt = v1->getInterPt();
 		const auto &v2ipt = v2->getInterPt();
-		cd_vertex * n11=new cd_vertex(v1ipt);
-		cd_vertex * n12=new cd_vertex(v1ipt);
-		cd_vertex * n21=new cd_vertex(v2ipt);
-		cd_vertex * n22=new cd_vertex(v2ipt);
+		cd_vertex * n11 = buf.getNewVertex(v1ipt);
+		cd_vertex * n12 = buf.getNewVertex(v1ipt);
+		cd_vertex * n21 = buf.getNewVertex(v2ipt);
+		cd_vertex * n22 = buf.getNewVertex(v2ipt);
 		
 		v1->setNext(n11);
 		n11->setNext(n22);
@@ -156,7 +153,7 @@ namespace acd2d
 	 * cut polys using cut_l into two polygons.
 	 */
 	inline cd_diagonal cutPolys
-	(pair<cd_polygon,cd_polygon>& result, cd_poly& poly, cd_line& cut_l)
+	(pair<cd_polygon,cd_polygon>& result, cd_poly& poly, cd_line& cut_l, cd_databuffer& buf)
 	{
 		//find cuts
 		pair<cd_vertex*, cd_vertex*> cut = FindCut_Out(poly,cut_l);
@@ -172,7 +169,7 @@ namespace acd2d
 		cd_vertex * nv2=v2->getNext();
 		UpdateBridge(v1,nv1,v2,nv2);
 	
-		addDiagnal(v1,v2);
+		addDiagnal(v1,v2, buf);
 		
 		//store polygonal chains
 		cd_poly p1(cd_poly::POUT),p2(cd_poly::POUT);
@@ -218,7 +215,7 @@ namespace acd2d
 	}
 	
 	inline cd_diagonal
-	mergeHole(cd_poly& out, cd_poly& hole, cd_line& cut_l)
+	mergeHole(cd_poly& out, cd_poly& hole, cd_line& cut_l, cd_databuffer& buf)
 	{
 		//find cuts
 		cd_vertex * v1, *v2;
@@ -226,9 +223,9 @@ namespace acd2d
 		v1=cut.first;
 		v2=cut.second;
 		v1->Intersect(cut_l);
-		addDiagnal(v1,v2, true);
+		addDiagnal(v1,v2, buf, true);
 		out.updateSize();
-		return cd_diagonal(cut.first->getInterPt(),cut.second->getInterPt());
+		return {cut.first->getInterPt(), cut.second->getInterPt()};
 	}
 }//namespace acd2d
 

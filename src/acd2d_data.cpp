@@ -15,12 +15,7 @@ namespace acd2d
 {
 	
 	double cd_vertex::MAX_CONCAVITY=FLT_MAX;
-	
-	cd_vertex::~cd_vertex()
-	{
-		removeBridge(this); 
-	}
-	
+
 	void cd_vertex::computeNormal()
 	{
 		normal=acd2d::computeNormal(next->pos-pos);
@@ -123,20 +118,6 @@ namespace acd2d
 	}
 	*/
 	
-	
-	// clean up the space allocated
-	void cd_poly::destroy()
-	{
-		if( head==NULL ) return;
-		cd_vertex* ptr=head;
-		do{
-			cd_vertex * n=ptr->getNext();
-			delete ptr;
-			ptr=n;
-		}while( ptr!=head and ptr != nullptr);
-		head=tail=nullptr;
-	}
-	
 	// Create a empty polygon
 	void cd_poly::beginPoly()
 	{
@@ -144,9 +125,10 @@ namespace acd2d
 	}
 	
 	// Add a vertex to the polygonal chian
-	void cd_poly::addVertex( double x, double y )
+	void cd_poly::addVertex(cd_databuffer& buf, double x, double y )
 	{
-		cd_vertex * v=new cd_vertex(Point2d(x,y));
+		cd_vertex * v= buf.getNewVertex();
+        *v = cd_vertex(Point2d(x, y));
 		addVertex(v);
 	}
 	
@@ -363,15 +345,12 @@ namespace acd2d
 	
 	
 	//copy from the given ply
-	void cd_poly::copy(const cd_poly& other)
+	void cd_poly::copy(cd_databuffer& buf, const cd_poly& other)
 	{
-		destroy();//detroy myself first
-	
 		cd_vertex* ptr=other.head;
 		beginPoly();
 		do{
-			cd_vertex * v=new cd_vertex();
-			assert(v); //check for memory
+			cd_vertex * v= buf.getNewVertex();
 			v->copy(ptr);
 			addVertex(v);
 			ptr=ptr->getNext();
@@ -388,35 +367,6 @@ namespace acd2d
 		size=other.size;
 		intersect=other.intersect;
 		m_CW=other.m_CW;
-	}
-	
-	istream& operator>>( istream& is, cd_poly& poly)
-	{
-		int vsize; string str_type;
-		is>>vsize>>str_type;
-		
-		if( str_type.find("out")!=string::npos )
-			poly.type=cd_poly::POUT;
-		else poly.type=cd_poly::PIN;
-		
-		poly.beginPoly();
-		//read in all the vertices
-		int iv;
-		vector< pair<double,double> > pts; pts.reserve(vsize);
-		for( iv=0;iv<vsize;iv++ ){
-			double x,y;
-			is>>x>>y;
-			pts.push_back(pair<double,double>(x,y));
-			//double d=x*x+y*y;
-		}
-		int id;
-		for( iv=0;iv<vsize;iv++ ){
-			is>>id; id=id-1;
-			poly.addVertex(pts[id].first,pts[id].second);
-		}
-		
-		poly.endPoly();
-		return is;
 	}
 	
 	ostream& operator<<( ostream& os, const cd_poly& p)
@@ -588,26 +538,15 @@ namespace acd2d
 	}
 	
 	//copy from the given polygon
-	void cd_polygon::copy(const cd_polygon& other)
+	void cd_polygon::copy(cd_databuffer& buf, const cd_polygon& other)
 	{
-		//destroy myself
-		destroy();
-	
+        clear();
 		for(const_iterator i=other.begin();i!=other.end();i++){
 			cd_poly p(cd_poly::UNKNOWN);
-			p.copy(*i);
+			p.copy(buf, *i);
 			push_back(p);
 		}
 	}
-	
-	void cd_polygon::destroy()
-    {
-		for(auto & i : *this) {
-			i.destroy();
-		}
-		clear(); //remove all ply from this list
-	}
-	
 	
 	ostream& operator<<( ostream& out, const cd_polygon& p)
 	{
@@ -654,5 +593,17 @@ namespace acd2d
 	{
 		max_r=measure->findMaxNotch(v1,v2);
 	}
-	
+
+    cd_bridge* cd_databuffer::getNewBridge() {
+      auto* b = new cd_bridge();
+      bridges.push_back(b);
+      return b;
+    }
+
+    cd_databuffer::~cd_databuffer() {
+      for (auto b : bridges) {
+        delete b;
+      }
+    }
+
 }//namespace acd2d

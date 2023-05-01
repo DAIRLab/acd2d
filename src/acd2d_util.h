@@ -79,46 +79,46 @@ namespace acd2d
 	}
 	*/
 	
-	inline void read_poly(const string& name, cd_polygon& polygon)
-	{
-		ifstream fin(name.c_str());
-		if( fin.good()==false ){
-			cerr<<"! ERROR: can NOT open file : "<<name<<endl;
-			return;
-		}
-		fin>>polygon;
-		//close the file
-		fin.close();
-	}
+//	inline void read_poly(const string& name, cd_polygon& polygon)
+//	{
+//		ifstream fin(name.c_str());
+//		if( fin.good()==false ){
+//			cerr<<"! ERROR: can NOT open file : "<<name<<endl;
+//			return;
+//		}
+//		fin>>polygon;
+//		//close the file
+//		fin.close();
+//	}
 	
-	///////////////////////////////////////////////////////////////////////////
-	// Save all polygons in acd as *.poly file
-	inline void save_polys(ostream& fout, const list<cd_polygon>& polys)
-	{
-		typedef list<cd_polygon>::const_iterator PIT;
-		for( PIT ip=polys.begin();ip!=polys.end();ip++ ) //for each poly
-			fout<<*ip;
-	}
+//	///////////////////////////////////////////////////////////////////////////
+//	// Save all polygons in acd as *.poly file
+//	inline void save_polys(ostream& fout, const list<cd_polygon>& polys)
+//	{
+//		typedef list<cd_polygon>::const_iterator PIT;
+//		for( PIT ip=polys.begin();ip!=polys.end();ip++ ) //for each poly
+//			fout<<*ip;
+//	}
 	
-	inline void save_polys(const string& name, const cd_2d& cd)
-	{
-		//get two list
-		const list<cd_polygon>& todo=cd.getTodoList();
-		const list<cd_polygon>& done=cd.getDoneList();
-	
-		//count total polygonal chain
-		int totalPC=0;
-		typedef list<cd_polygon>::const_iterator PIT;
-		{for( PIT ip=todo.begin();ip!=todo.end();ip++ ) totalPC+=ip->size();}
-		{for( PIT ip=done.begin();ip!=done.end();ip++ ) totalPC+=ip->size();}
-	
-		ofstream fout(name.c_str());
-		fout<<totalPC<<"\n";
-		save_polys(fout,todo);
-		save_polys(fout,done);
-		fout.close();
-	}
-	
+//	inline void save_polys(const string& name, const cd_2d& cd)
+//	{
+//		//get two list
+//		const list<cd_polygon>& todo=cd.getTodoList();
+//		const list<cd_polygon>& done=cd.getDoneList();
+//
+//		//count total polygonal chain
+//		int totalPC=0;
+//		typedef list<cd_polygon>::const_iterator PIT;
+//		{for( PIT ip=todo.begin();ip!=todo.end();ip++ ) totalPC+=ip->size();}
+//		{for( PIT ip=done.begin();ip!=done.end();ip++ ) totalPC+=ip->size();}
+//
+//		ofstream fout(name.c_str());
+//		fout<<totalPC<<"\n";
+//		save_polys(fout,todo);
+//		save_polys(fout,done);
+//		fout.close();
+//	}
+//
 	///////////////////////////////////////////////////////////////////////////
 	//compute the normal vertor to the given vertor v
 	inline Vector2d computeNormal(const Vector2d& v)

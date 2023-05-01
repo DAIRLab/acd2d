@@ -16,6 +16,7 @@ using namespace std;
 
 #include <mathtool/acd2d_Point.h>
 #include <mathtool/acd2d_Vector.h>
+#include <vector>
 
 namespace acd2d
 {
@@ -24,6 +25,7 @@ namespace acd2d
 	class cd_bridge;
 	class hull_2d;
 	class IConcavityMeasure;
+    class cd_databuffer;
 	
 	///////////////////////////////////////////////////////////////////////////////
 	
@@ -50,7 +52,6 @@ namespace acd2d
 		///////////////////////////////////////////////////////////////////////////
 		cd_vertex(){ init(); }
 		cd_vertex( const Point2d& p ){ pos=p; init(); }
-		~cd_vertex();
 		void setNext(cd_vertex * n){next=n; if(n!=NULL) n->pre=this; }
 		void setPre(cd_vertex * n){pre=n; if(n!=NULL) n->next=this; }
 	
@@ -131,17 +132,16 @@ namespace acd2d
 		///////////////////////////////////////////////////////////////////////////
 		cd_poly(POLYTYPE t){ head=NULL; type=t; intersect=false; radius=-1; }
 		//cd_poly(const cd_poly& other);
-		void destroy();
 	
 		///////////////////////////////////////////////////////////////////////////
 		// create cd_poly
 		void beginPoly();
-		void addVertex( double x, double y );
-		void addVertex( cd_vertex * v );
+		void addVertex(cd_databuffer& buf, double x, double y );
+		void addVertex(cd_vertex * v );
 		void endPoly();
 		
 		///////////////////////////////////////////////////////////////////////////
-		void copy(const cd_poly& other);
+		void copy(cd_databuffer& buf, const cd_poly& other);
 		
 		///////////////////////////////////////////////////////////////////////////
 		void scale(float f);
@@ -228,12 +228,8 @@ namespace acd2d
 		void scale(float factor);
 		void normalize();
 		bool valid() const; //check if this is a valid polygon
-		void copy(const cd_polygon& other);
-		void destroy();
-		
-		friend ostream& operator<<( ostream&, const cd_polygon& );
-		friend istream& operator>>( istream&, cd_polygon& );
-		
+		void copy(cd_databuffer& buf, const cd_polygon& other);
+
 	private:
 	
 		// Dep_El
@@ -262,7 +258,27 @@ namespace acd2d
 		typedef DEL::iterator DIT; 
 		DEL m_DependList; //this decides the order of dependency
 	};
-	
+
+    class cd_databuffer {
+     public:
+      static constexpr size_t kExpectedMaxVerts = 1024;
+      cd_databuffer() {verts.reserve(kExpectedMaxVerts);}
+      cd_vertex* getNewVertex() {
+        verts.emplace_back();
+        return &verts.back();
+      }
+      cd_vertex* getNewVertex(const Point2d& pt) {
+        verts.emplace_back();
+        verts.back() = cd_vertex(pt);
+        return &verts.back();
+      }
+      cd_bridge* getNewBridge();
+      ~cd_databuffer();
+     private:
+      std::vector<cd_vertex> verts;
+      std::vector<cd_bridge*> bridges;
+    };
+
 	///////////////////////////////////////////////////////////////////////////////
 	//find the out most boudnary in this given polygon
 	inline cd_poly& findOutMost(cd_polygon& poly){

@@ -36,7 +36,7 @@ namespace acd2d
 		{
 			cd_polygon mypoly;
 			todo_list.push_back(mypoly);
-			todo_list.back().copy(poly);
+			todo_list.back().copy(buf_, poly);
 			todo_list.back().buildDependency();
 		}
 		else
@@ -45,9 +45,6 @@ namespace acd2d
 	
 	void cd_2d::destroy()
 	{
-		typedef list<cd_polygon>::iterator IT;
-		for(IT i=todo_list.begin();i!=todo_list.end();i++) i->destroy();
-		for(IT i=done_list.begin();i!=done_list.end();i++) i->destroy();
 		todo_list.clear();
 		done_list.clear();
 	}
@@ -166,7 +163,7 @@ namespace acd2d
 		//cut into two polys
 		pair<cd_polygon,cd_polygon> sub_polys;
 		try{
-			cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l);
+			cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l, buf_);
 			if(store_diagoanls) dia_list.push_back(dia);
 		} catch (exception e) {
 			throw std::runtime_error(e.what());
@@ -201,7 +198,7 @@ namespace acd2d
       //cut into two polys
       pair<cd_polygon,cd_polygon> sub_polys;
       try{
-        cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l);
+        cd_diagonal dia=cutPolys(sub_polys,polys.front(),cut_l, buf_);
         if(store_diagoanls) dia_list.push_back(dia);
         //add into to do
         todo_list.push_back(sub_polys.first);
@@ -222,7 +219,7 @@ namespace acd2d
 		//find which cw is better
 		cd_line cut_l;
 		find_a_good_cutline_for_hole(cut_l,r,out);
-		cd_diagonal dia=mergeHole(out,poly,cut_l);
+		cd_diagonal dia=mergeHole(out,poly,cut_l, buf_);
 		todo_list.push_back(polys);
 	
 		//store cut line

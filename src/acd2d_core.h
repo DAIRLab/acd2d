@@ -48,6 +48,7 @@ namespace acd2d
 		const list<cd_polygon>& getDoneList() const { return done_list; }
 		const list<cd_diagonal>& getDiagonal() const { return dia_list; }
 		void updateCutDirParameters( double a, double b ){ alpha=a; beta=b;  }
+        cd_databuffer& buf() {return buf_;}
 	
 		///////////////////////////////////////////////////////////////////////////
 		//other functions
@@ -62,7 +63,7 @@ namespace acd2d
         void decompose_IN(double d, cd_polygon& polys, cd_poly& poly);
 	
 	private:
-	
+	    cd_databuffer buf_;
 		list<cd_polygon> todo_list;
 		list<cd_polygon> done_list;
 	
