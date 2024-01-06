@@ -209,9 +209,8 @@ namespace acd2d
 	
 		if( min_v!=NULL )
 			return pair<cd_vertex*,cd_vertex*> (cut_l.support,min_v);
-
-		cerr<<"! ERROR: FindCut_In Error"<<endl;
-		exit(1);
+        
+        throw std::runtime_error("! ERROR: FindCut_In Error");
 	}
 	
 	inline cd_diagonal
