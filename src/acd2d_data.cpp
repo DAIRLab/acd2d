@@ -290,7 +290,7 @@ namespace acd2d
 			iter++;
 		}while(ptr!=head and iter < kMaxIter);
 		if (iter == kMaxIter) {
-			throw std::runtime_error("found it");
+			throw std::runtime_error("acd2d getBridges max iterations reached");
 		}
 	}
 	

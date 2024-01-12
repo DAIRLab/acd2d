@@ -104,7 +104,7 @@ namespace acd2d
 			ptr=next(ptr);
 		}//while(ptr!=ne);
 		if (total_iter == kMaxIter) {
-			throw std::runtime_error("found it");
+			throw std::runtime_error("acd2d convex hull reached iteration limit");
 		}
 		hull.pop_back();
 	}
