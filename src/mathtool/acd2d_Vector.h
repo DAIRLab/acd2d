@@ -192,7 +192,7 @@ namespace acd2d
     Vector<T,D> Vector<T,D>::operator%(const Vector<T,D>& v2) const
     {
         if( D>3 ){
-            throw std::runtime_error("cannot take cross product of " << D << "D Vector");
+            throw std::runtime_error("cannot take cross product of D Vector");
         }
         if( D==2 ) return Vector<T,D>(0,0);
         //D==3
