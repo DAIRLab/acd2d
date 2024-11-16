@@ -24,8 +24,7 @@ namespace acd2d
 			return A_poly(hull);
 		}//end for
 	
-		cerr<<"! ERROR:hullArea"<<endl;
-		exit(1);
+		throw std::runtime_error("! ERROR:hullArea");
 	}
 	
 	inline double convexity(const cd_2d& cd)

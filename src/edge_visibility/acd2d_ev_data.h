@@ -38,8 +38,7 @@ namespace acd2d
 			for( int i=0;i<3;i++ ){
 				if( v[i]!=v1 && v[i]!=v2 ) return v[i];
 			}
-			cerr<<"!ERROR: getOppV"<<endl;
-			exit(1);
+			throw std::runtime_error("!ERROR: getOppV");
 		}
 	
 		ev_triangle * getOppT(int v1, int v2){
@@ -47,8 +46,7 @@ namespace acd2d
 				if( t[i]==NULL ) return NULL;
 				if( t[i]->isIn(v1) && t[i]->isIn(v2) ) return t[i];
 			}
-			cerr<<"!ERROR: getOppT"<<endl;
-			exit(1);
+			throw std::runtime_error("!ERROR: getOppT");
 		}
 	
 		bool isIn( int vt ){

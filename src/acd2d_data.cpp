@@ -429,8 +429,7 @@ namespace acd2d
 	
 		if( m_DependList.empty() )
 			return findOutMost(*this);
-		cerr<<"! Error: cd_poly: Dependcy Error Found"<<endl;
-		exit(1);
+		throw std::runtime_error("! Error: cd_poly: Dependcy Error Found");
 	}
 	
 	void cd_polygon::findDependency
